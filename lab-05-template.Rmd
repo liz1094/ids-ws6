@@ -136,7 +136,7 @@ ggplot(candy_df, aes(x = winpercent)) +
 Most candies have win percentages between 30% and 60%, with the highest frequency in the 40%–50% interval. The distribution is unimodal and slightly right-skewed, with relatively few candies having very high win percentages.
 
 
-# Play with the binwidth or bins parameter in the new version by using binwidth = 20.
+## Play with the binwidth or bins parameter in the new version by using binwidth = 20.
 
 ```{r}
 ggplot(candy_df, aes(x = winpercent)) +
@@ -148,6 +148,7 @@ ggplot(candy_df, aes(x = winpercent)) +
     y = "Number of candies"
   )
 ```
+
 Increasing the bin width from 10 to 20 produces fewer, wider bars. For example, the 40%–50% and 50%–60% intervals are combined into one 40%–60% interval containing 39 candies. The overall pattern remains visible, but finer details are lost. The underlying data and total number of candies remain unchanged.
 
 
