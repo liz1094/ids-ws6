@@ -1,6 +1,6 @@
 ---
 title: "Lab 05 - Halloween Candies & Data Viz Improvement"
-author: "User1, User2, User3 and User4 - Team Name"
+author: Chenxi Li
 date: "`r Sys.Date()`"
 output: html_document
 ---
@@ -21,9 +21,7 @@ library(ggplot2)
 knitr::include_graphics("img/Speaking-the-world.jpg")
 ```
 
-_Write your comments about image 1 below_
-
-
+The bar lengths are not proportional to the stated values. For example, English has about 1.64 times as many speakers as Spanish, but their bars appear almost equal in length. The Chinese bar is also much thicker, which exaggerates its visual prominence. The chart does not clearly specify the year, source, or definition of “speakers”. A sorted horizontal bar chart with consistent widths, a zero baseline and a common unit would make comparisons clearer.
 
 
 ## Image 2
@@ -32,9 +30,7 @@ _Write your comments about image 1 below_
 knitr::include_graphics("img/rose-pop-density-total-area-bw.jpg")
 ```
 
-_Write your comments about image 2 below_
-
-
+The chart does not explain how angle and radius represent the two variables. Sector areas combine both dimensions, making comparisons difficult. A labelled scatter plot would show the relationship between total area and population density more clearly.
 
 
 ## Image 3
@@ -43,9 +39,7 @@ _Write your comments about image 2 below_
 knitr::include_graphics("img/life-expectancy-rule-of-law.png")
 ```
 
-_Write your comments about image 3 below_
-
-
+The scatter plot is suitable for showing an association, but overlapping points and labels make it difficult to read. Clear scales and legends are needed. The positive association does not establish that stronger rule of law causes higher life expectancy.
 
 
 ## Image 4
@@ -54,8 +48,7 @@ _Write your comments about image 3 below_
 knitr::include_graphics("img/global-income-dist.PNG")
 ```
 
-_Write your comments about image 4 below_
-
+The chart provides useful information about the global income distribution, but stacked regions are difficult to compare because they do not share a common baseline. The logarithmic income scale also requires careful explanation. Separate density plots would make regional distributions easier to compare, while the stacked chart is useful for showing their contributions to the global population.
 
 
 # Data Visualization for Halloween 
@@ -83,7 +76,10 @@ glimpse(candy_df)
 How many observations and variables are in this dataset?
 Did you identify the type of variables, remember that this detail is crucial to create which kind of data visualization in general. 
 
-_Write your comments about results_
+The dataset contains 85 observations and 13 variables. Each observation represents one candy or competing item. There is one character variable (`competitorname`), nine logical variables describing binary characteristics, and three numerical variables (`sugarpercent`, `pricepercent`, and `winpercent`).
+
+Variable types help determine the appropriate visualisation. For example, bar charts can show counts of categorical values, histograms can show numerical distributions, and scatter plots can show relationships between two numerical variables.
+
 
 # Data viz - One variable at a time
 
@@ -94,23 +90,65 @@ candy_df <- candy_df %>%
   mutate(across(where(is.logical), as_factor))
 ```
 
+
 ## Exercise 2
 
 Complete the following code to get the data viz to represent "how many candies contain caramel via bar plot". Fill in the blanks, remove the # symbol in front of your code and the execute the code chunk via green play button.
 
 ```{r}
-# ggplot(candy_rankings, aes(x = ______)) +
-#  _____() +
+ggplot(candy_rankings, aes(x = caramel)) +
+  geom_bar()
 ```
+
+Most candies in this dataset do not contain caramel. The bar for FALSE is much taller than the bar for TRUE, indicating that candies without caramel are more common in this dataset.
+
+
+## How many candies contain chocolate?
+
+```{r}
+ggplot(candy_df, aes(x = chocolate)) +
+  geom_bar() +
+  labs(
+    title = "How many candies contain chocolate?",
+    x = "Contains chocolate",
+    y = "Number of candies"
+  )
+```
+
+Candies without chocolate are more common than candies with chocolate in this dataset. However, the difference between the two groups is smaller than the difference between candies with and without caramel.
+
 
 ## Exercise 3
 
 Now look at a numerical variable, such as `winpercent`. Create an histogram for this variable using ggplot2 functions below. Include informative x and y labels and a title, as a good practice.
 
 ```{r}
-# Your code here
-
+ggplot(candy_df, aes(x = winpercent)) +
+  geom_histogram(binwidth = 10, boundary = 0,
+                 fill = "steelblue", colour = "white") +
+  labs(
+    title = "Distribution of candy win percentages",
+    x = "Win percentage (%)",
+    y = "Number of candies"
+  )
 ```
+
+Most candies have win percentages between 30% and 60%, with the highest frequency in the 40%–50% interval. The distribution is unimodal and slightly right-skewed, with relatively few candies having very high win percentages.
+
+
+# Play with the binwidth or bins parameter in the new version by using binwidth = 20.
+
+```{r}
+ggplot(candy_df, aes(x = winpercent)) +
+  geom_histogram(binwidth = 20, boundary = 0,
+                 fill = "steelblue", colour = "white") +
+  labs(
+    title = "Distribution of candy win percentages (binwidth = 20)",
+    x = "Win percentage (%)",
+    y = "Number of candies"
+  )
+```
+Increasing the bin width from 10 to 20 produces fewer, wider bars. For example, the 40%–50% and 50%–60% intervals are combined into one 40%–60% interval containing 39 candies. The overall pattern remains visible, but finer details are lost. The underlying data and total number of candies remain unchanged.
 
 
 # Data viz - more than one variable
