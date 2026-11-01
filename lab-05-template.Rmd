@@ -103,7 +103,7 @@ ggplot(candy_rankings, aes(x = caramel)) +
 Most candies in this dataset do not contain caramel. The bar for FALSE is much taller than the bar for TRUE, indicating that candies without caramel are more common in this dataset.
 
 
-## How many candies contain chocolate?
+- How many candies contain chocolate?
 
 ```{r}
 ggplot(candy_df, aes(x = chocolate)) +
@@ -136,7 +136,7 @@ ggplot(candy_df, aes(x = winpercent)) +
 Most candies have win percentages between 30% and 60%, with the highest frequency in the 40%–50% interval. The distribution is unimodal and slightly right-skewed, with relatively few candies having very high win percentages.
 
 
-## Play with the binwidth or bins parameter in the new version by using binwidth = 20.
+- Play with the binwidth or bins parameter in the new version by using binwidth = 20.
 
 ```{r}
 ggplot(candy_df, aes(x = winpercent)) +
@@ -161,26 +161,85 @@ How about using the both variables; chocolate vs winpercent? Run the following i
 Fill in the blanks, remove the # symbol in front of your code and the execute the code chunk via green play button.
 
 ```{r}
-# Your code here
-#ggplot(candy_df, aes(x = ___________)) +
-#  geom_histogram() +
-#  facet_wrap(___________)
+ggplot(candy_df, aes(x = winpercent)) +
+  geom_histogram(binwidth = 5) +
+  facet_wrap(~chocolate)
 
 ```
 
 
 - Consider adding the `fill = caramel` within the aes() vs. geom_histogram(), what do you get? 
 
+```{r}
+ggplot(candy_df, aes(x = winpercent, fill = caramel)) +
+  geom_histogram(binwidth = 5) +
+  facet_wrap(~chocolate) +
+  labs(
+    title = "Candy win percentages by chocolate and caramel content",
+    x = "Win percentage (%)",
+    y = "Number of candies",
+    fill = "Contains caramel"
+  )
+```
+
+Inside aes(), fill = caramel maps caramel content to different colours, producing stacked histograms with a legend. Outside aes(), a fixed fill value such as "steelblue" gives all bars the same colour and does not represent caramel content.
+
+
 ## Exercise 5
 
 Create a visualization that examines the relationship between a candy’s win percentage and whether it contains chocolate. Include x and y labels and a title. Describe any relationship you see.
 
 ```{r}
-# your code here
-
+ggplot(candy_df, aes(x = chocolate, y = winpercent)) +
+  geom_boxplot() +
+  labs(
+    title = "Candy win percentages by chocolate content",
+    x = "Contains chocolate?",
+    y = "Win percentage (%)"
+  )
 ```
 
+Candies containing chocolate tend to have higher win percentages. Their median win percentage is approximately 60.8%, compared with 41.6% for candies without chocolate, a difference of 19.2 percentage points. The chocolate group also has a larger interquartile range. However, the groups overlap, and this association does not establish causation.
+
+
 - Consider the similar pair by replacing chocolate with caramel, fruity and compare their results. 
+
+```{r}
+ggplot(candy_df, aes(x = caramel, y = winpercent, fill = caramel)) +
+  geom_boxplot() +
+  labs(
+    title = "Candy win percentages by caramel content",
+    x = "Contains caramel?",
+    y = "Win percentage (%)",
+    fill = "Contains caramel?"
+  )
+```
+
+```{r}
+ggplot(candy_df, aes(x = fruity, y = winpercent, fill = fruity)) +
+  geom_boxplot() +
+  labs(
+    title = "Candy win percentages by fruit flavour",
+    x = "Fruit-flavoured?",
+    y = "Win percentage (%)",
+    fill = "Fruit-flavoured?"
+  )
+```
+
+
+```{r}
+ggplot(candy_df,
+       aes(x = fruity, y = winpercent, fill = caramel)) +
+  geom_boxplot() +
+  labs(
+    title = "Candy win percentages by fruit flavour and caramel content",
+    x = "Fruit-flavoured?",
+    y = "Win percentage (%)",
+    fill = "Contains caramel?"
+  )
+```
+
+
 - Also include summary statistics details for this discussion by using the calculation below: 
 
 ```{r}
@@ -199,13 +258,47 @@ candy_rankings %>%
 Do more expensive candies win more often? Make a scatterplot of pricepercent (x) against winpercent (y). Describe their relationship.  
 
 ```{r}
-# your code here
-
+ggplot(candy_df, aes(x = pricepercent, y = winpercent)) +
+  geom_point() +
+  labs(
+    title = "Pricier candies win slightly more often",
+    x = "Price percentile (0 = cheapest, 1 = most expensive)",
+    y = "Win percentage (%)"
+  )
 ```
+
+There is a positive association between price percentile and win percentage, although the points are widely scattered. More expensive candies tend to win more often, but there are many exceptions. Price alone does not reliably predict a candy’s win percentage.
 
 
 - Add `color = chocolate` to add a third variable to the created visualization
+
+```{r}
+ggplot(candy_df, aes(x = pricepercent, y = winpercent, color = chocolate)) +
+  geom_point() +
+  labs(
+    title = "Pricier candies over chocolate type",
+    x = "Price percentile (0 = cheapest, 1 = most expensive)",
+    y = "Win percentage (%)"
+  )
+```  
+ 
+  Colouring the points by chocolate content reveals that chocolate candies tend to have both higher price percentiles and higher win percentages. Chocolate content may therefore partly account for the overall association between price and win percentage. The plot does not show that increasing price causes a candy to become more popular.
+  
+  
 - How to facet this by using another categorical variable such as `bar`? 
+
+```{r}
+ggplot(candy_df, aes(x = pricepercent, y = winpercent, color = chocolate)) +
+  geom_point() +
+  facet_grid(~ bar) + 
+  labs(
+    title = "Pricier candies over chocolate type and bar categories",
+    x = "Price percentile (0 = cheapest, 1 = most expensive)",
+    y = "Win percentage (%)"
+  )
+```
+
+Most bar-shaped candies contain chocolate and have relatively high price percentiles. Non-bar candies include a wider mixture of chocolate and non-chocolate products. Within each panel, the relationship between price and win percentage is less clear, suggesting that candy characteristics should be considered alongside price.
 
 
 ## Exercise 7
@@ -213,18 +306,38 @@ Do more expensive candies win more often? Make a scatterplot of pricepercent (x)
 Are chocolate candies more likely to be candy bars? Make a filled bar plot with chocolate on the x-axis and fill = bar. Describe what you see.
 
 ```{r}
-# Your code here
-
+ggplot(candy_df, aes(x = chocolate, fill = bar)) +
+  geom_bar(position = "fill") +
+  labs(
+    title = "About half of chocolate candies are bars",
+    x = "Contains chocolate?",
+    y = "Proportion of candies",
+    fill = "Candy bar?"
+  )
 ```
+
+Chocolate candies are much more likely to be bars in this dataset. Approximately 54% of chocolate candies are bars, compared with about 2% of non-chocolate candies. Each bar represents 100% of its chocolate category, so the chart compares proportions rather than counts.
 
 
 ## Exercise 8
 Create a new variable called price per sugar ratio as the division of pricepercent and sugarpercent. Plot it against winpercent, and set the color of all points to blue for the competitors who are not "One dime" or "One quarter". Include x and y labels and a title. Describe any relationship you see.
 
 ```{r}
-# your code here
+candy_rankings <- candy_rankings %>%
+  mutate(price_per_sugar = pricepercent / sugarpercent)
 
+candy_rankings %>%
+  filter(!competitorname %in% c("One dime", "One quarter")) %>%
+  ggplot(aes(x = price_per_sugar, y = winpercent)) +
+  geom_point(color = "blue") +
+  labs(
+    title = "Price per sugar is not linked to win percentage",
+    x = "Price per sugar (price percentile / sugar percentile)",
+    y = "Win percentage (%)"
+  )
 ```
+
+The scatter plot shows no clear relationship between the price-to-sugar percentile ratio and win percentage. Most candies have ratios below approximately 2, but their win percentages vary widely. A few candies have much larger ratios, with both high and low win percentages. This ratio compares percentile measures rather than actual price per unit of sugar.
 
 
 ## Exercise 9
@@ -232,9 +345,18 @@ Create a new variable called price per sugar ratio as the division of priceperce
 Modify your plot in Exercise 8 to facet by whether a candy is bar-shaped. Have the color reflect whether the candy is fruity or not. The plot must include x and y labels along with a title. How do these plots compare to each other?
 
 ```{r}
-# your code here
-
+ggplot(candy_rankings, aes(x = price_per_sugar, y = winpercent, color = fruity)) +
+  geom_point() +
+  facet_wrap(~ bar, labeller = label_both) +
+  labs(
+    title = "Candy bars win more often, and none of them are fruity",
+    x = "Price-sugar index",
+    y = "Win percentage (%)",
+    color = "Fruity?"
+  )
 ```
+
+Bar-shaped candies generally have higher win percentages than non-bar candies, although the groups overlap. All bar-shaped candies in this dataset are non-fruity, while non-bar candies include both fruity and non-fruity varieties. Neither panel shows a clear relationship between the price-to-sugar percentile ratio and win percentage. Faceting and colour reveal group differences that were hidden in the original plot.
 
 
 ---
@@ -248,91 +370,129 @@ staff <- read_csv("data/instructional-staff.csv")
 
 ## Exercise 1
 
-What is the difference between *wide format* data and *long format* data?
+- What is the difference between *wide format* data and *long format* data?
 
 
-Is the format `staff` data *wide* or *long*?
+- Is the format `staff` data *wide* or *long*?
 
 
-How many observations are there in the data set?
+- How many observations are there in the data set?
 
 
+In wide format, measurements for different years are stored in separate columns. In long format, the years are stored in one column and the corresponding values in another, with one row per faculty-type–year combination.
+
+The staff dataset is in wide format. It has 5 rows and 12 columns: one faculty-type column and 11 year columns. Taking each faculty-type–year combination as an observation, there are 5 × 11 = 55 observations, which would occupy 55 rows in long format.
 
 
 ## Exercise 2
 
 ```{r pivoting}
-## Uncomment and complete the following code
-
-#staff_long <- ___ %>%
-#  ___(
-#    cols = ____, 
-#    names_to = "_____",
-#    values_to = "percent"
-#    )
-
+staff_long <- staff %>%
+  pivot_longer(
+    cols = c("1975", "1989", "1993", "1995", "1999", "2001", 
+             "2003", "2005", "2007", "2009", "2011"),   
+    names_to = "year",
+    values_to = "percent"
+    )
 ```
+
+The staff_long dataset has 55 rows and 3 columns: faculty_type, year, and percent. Each row represents one faculty type in one year. This matches the 55 observations identified in Exercise 1: 5 faculty types × 11 years.
 
 
 ## Exercise 3
 
 ```{r dot-plot}
-# Write your code for Exercise 3 here
-
-
-
+ggplot(data = staff_long,
+       mapping = aes(x = year, 
+                     y = percent, 
+                     colour = faculty_type)) +
+  geom_point()
 ```
 
 ## Exercise 4
 
 ```{r bad-line-plot}
-# Write your code for Exercise 4 here
-
-
-
+ggplot(data = staff_long,
+       mapping = aes(x = year, 
+                     y = percent, 
+                     colour = faculty_type)) +
+  geom_line()
 ```
+
+Note that the lines in this plot do not appear! This is because the type of variable year is character.
+
 
 ## Exercise 5
 
 ```{r mutate-year}
-## Uncomment and complete the following code
-
-#staff_long <- staff_long %>%
-#  mutate(year = ______(year))
+staff_long <- staff_long %>%
+  mutate(year = as.numeric(year))
 ```
 
 
 ```{r working-line-plot}
-# Write your code for Exercise 5 here
-
-
-
+ggplot(data = staff_long,
+       mapping = aes(x = year, 
+                     y = percent, 
+                     colour = faculty_type)) +
+  geom_line()
 ```
+
 
 ## Exercise 6
 
 ```{r better-line-plot}
-# Write your code for Exercise 6 here
-
-
-
-
+ggplot(data = staff_long,
+       mapping = aes(x = year, 
+                     y = percent, 
+                     colour = faculty_type)) +
+  geom_line() +
+  labs(
+    title = "Instructional staff employment trends, 1975–2011",
+    x = "Year",
+    y = "Percentage",
+    colour = "Faculty Type",
+    caption = "Data source: American Association of University Professors"
+  )
 ```
 
 ## Exercise 7
 
-_Write below your ideas for adapting the line plot_
-
-* Idea 1
-* Idea 2
-* Idea 3
-* ...
+I would highlight part-time faculty in red and display the other staff types in grey. This would draw attention to the increase in the part-time share while retaining the other trends for comparison. I would also use a clear title, a minimal theme and a legend below the plot.
 
 
 ```{r implement-Ex7}
-# Write your code for Exercise 7 here, based on one of your ideas
-
-
-
+staff_long <- staff_long %>%
+  mutate(
+    part_time = case_when(
+      faculty_type == "Part-Time Faculty" ~ "Part-Time Faculty",
+      TRUE ~ "Other Faculty Types"
+    )
+  )
+ggplot(staff_long,
+       aes(x = year,
+           y = percent,
+           group = faculty_type,
+           colour = part_time)) +
+  geom_line() +
+  scale_colour_manual(
+    values = c(
+      "Other Faculty Types" = "grey65",
+      "Part-Time Faculty" = "red"
+    )
+  ) +
+  theme_minimal() +
+  labs(
+    title = "Part-time faculty's share rose from 24.0% to 41.3%",
+    subtitle = "Instructional staff employment, 1975–2011",
+    x = "Year",
+    y = "Percentage of instructional staff (%)",
+    colour = "",
+    caption = "Source: US Department of Education, IPEDS; compiled by AAUP"
+  ) +
+  coord_cartesian(ylim = c(0, 45)) +
+  theme(legend.position = "bottom")
 ```
+
+I highlighted part-time faculty in red and kept the other four staff categories as separate grey lines for comparison. A minimal theme and a bottom legend reduce visual clutter, while the title states the main finding. The proportion of part-time faculty increased from 24.0% in 1975 to 41.3% in 2011, an increase of 17.3 percentage points.
 
